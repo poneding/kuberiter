@@ -1,0 +1,86 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: kuberiter-sa
+rules:
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - articles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - articles/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - articles/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - tags
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - tags/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - tags/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - users
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - users/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.kuberiter.io
+  resources:
+  - users/status
+  verbs:
+  - get
+  - patch
+  - update

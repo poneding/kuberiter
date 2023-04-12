@@ -1,0 +1,30 @@
+apiVersion: core.kuberiter.io/v1alpha1
+kind: Article
+metadata:
+  name: article-sample
+spec:
+  title: "Hello Kuberiter"
+  description: "This is a sample article"
+  content: |
+    # Hello Kuberiter
+    This is a sample article. You can write your article in `markdown` format.
+
+    ## Images
+    ![Kuberiter Logo](https://raw.githubusercontent.com/poneding/kuberiter/master/docs/images/writer.jpg)
+
+    ## Codes
+    ```go
+    package main
+
+    import "fmt"
+
+    func main() {
+      # Print Hello Kuberiter
+      fmt.Println("Hello Kuberiter")
+    }
+    ```
+  authors:
+    - kuberiter-admin
+  createdAt: "2023-04-02 14:24:34"
+  updatedAt: "2023-04-02 14:24:34"
+  likes: 0

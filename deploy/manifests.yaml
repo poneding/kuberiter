@@ -1,0 +1,145 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kuberiter
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kuberiter-sa
+  namespace: kuberiter
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kuberiter-sa
+rules:
+  - apiGroups:
+      - core.kuberiter.io
+    resources: ["*"]
+    verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kuberiter-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kuberiter-sa
+subjects:
+  - kind: ServiceAccount
+    name: kuberiter-sa
+    namespace: kuberiter
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuberiter-controller-manager
+  namespace: kuberiter
+  labels:
+    kuberiter.io/app: kuberiter-controller-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kuberiter.io/app: kuberiter-controller-manager
+  template:
+    metadata:
+      labels:
+        kuberiter.io/app: kuberiter-controller-manager
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: kuberiter-sa
+      containers:
+        - name: kuberiter-controller-manager
+          image: poneding/kuberiter-controller-manager:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: metrics
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      terminationGracePeriodSeconds: 10
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuberiter-api-server
+  namespace: kuberiter
+  labels:
+    kuberiter.io/app: kuberiter-api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kuberiter.io/app: kuberiter-api-server
+  template:
+    metadata:
+      labels:
+        kuberiter.io/app: kuberiter-api-server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: kuberiter-sa
+      containers:
+        - name: kuberiter-api-server
+          image: poneding/kuberiter-api-server:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+              name: http
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      terminationGracePeriodSeconds: 10
